@@ -1,31 +1,35 @@
-import { StyleSheet } from 'react-native';
+import * as React from "react";
+import {StyleSheet} from "react-native";
+import RenderMessages from '../../components/RenderMessages';
 
-import EditScreenInfo from '../../components/EditScreenInfo';
-import { Text, View } from '../../components/Themed';
-
-export default function TabOneScreen() {
+export default function Messages() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <RenderMessages />
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: 700,
+    borderRadius: 4,
+    padding: 10,
+    rowGap: 8,
+    backgroundColor: 'white'
+  },
+  flexing: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    columnGap: 3,
   },
   title: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 16,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  message: {
+    fontSize: 14,
   },
-});
+  time: {
+    color: '#575757',
+    fontSize: 10,
+  },
+})

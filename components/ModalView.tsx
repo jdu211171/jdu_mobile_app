@@ -19,11 +19,10 @@ interface ModalViewProps {
   messageTitle: string;
   messageText: string;
   date: string;
-  showModal: boolean;
-  setShowModal: React.Dispatch<React.SetStateAction<boolean>>;
+  modalVisible: boolean;
+  setModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   messageObject: MessageObjectParams;
-  save: (id: string, type: string) => void;
-  bookmarkState: boolean;
+  bookmarkState: boolean | undefined;
   setBookmarkState: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
@@ -33,16 +32,15 @@ const ModalView: React.FC<ModalViewProps> = ({
                                                messageTitle,
                                                messageText,
                                                date,
-                                               showModal,
-                                               setShowModal,
+                                               modalVisible,
+                                               setModalVisible,
                                                messageObject,
-                                               save,
                                                bookmarkState,
                                                setBookmarkState
                                              }) => {
   const [modalBookmarkState, setModalBookmarkState] = useState(bookmarkState);
   const handleCloseModal = () => {
-    setShowModal(false);
+    setModalVisible(false);
   };
 
   return (
@@ -50,19 +48,14 @@ const ModalView: React.FC<ModalViewProps> = ({
       <Modal
         animationType="none"
         transparent={false}
-        visible={showModal}
+        visible={modalVisible}
         hardwareAccelerated={true}
         onRequestClose={handleCloseModal}
       >
         <View style={styles.tabHeader}>
           <Pressable
             onPress={handleCloseModal}
-            style={{
-              display: 'flex',
-              position: 'absolute',
-              left: 15,
-              paddingTop: Platform.select({ ios: 30 })
-            }}
+            style={styles.backButton}
           >
             <Ionicons
               name={'arrow-back-outline'}
@@ -70,12 +63,7 @@ const ModalView: React.FC<ModalViewProps> = ({
               color={'#ffffff'}
             />
           </Pressable>
-          <Text style={{
-            color: "#ffffff",
-            textAlign: 'center',
-            fontSize: 20,
-            fontWeight: "600"
-          }}>
+          <Text style={styles.headerTitle}>
             {messageTitle.length > 25 ? messageTitle.slice(0, 18) + ('...') : messageTitle}
           </Text>
         </View>
@@ -84,6 +72,7 @@ const ModalView: React.FC<ModalViewProps> = ({
             <View style={styles.flexing}>
               <View style={[styles.flexingChild, styles.width]}>
                 <Ionicons
+                  // @ts-ignore
                   name={messageIconName}
                   size={24}
                   color={messageIconColor}
@@ -91,7 +80,7 @@ const ModalView: React.FC<ModalViewProps> = ({
                 <Text style={styles.title}>{messageTitle}</Text>
               </View>
               <TouchableOpacity onPress={() => {
-                save(messageObject.id, 'bookmark');
+                // save(messageObject.id, 'bookmark');
                 setModalBookmarkState(prevState => !prevState);
               }}>
                 <Ionicons
@@ -154,7 +143,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: "justify",
     flexShrink: 1,
-    columnGap: 3
+    columnGap: 3,
+  },
+  headerTitle: {
+    color: "#ffffff",
+    textAlign: 'center',
+    fontSize: 20,
+    fontWeight: "bold",
   },
   message: {
     fontSize: 14,
@@ -163,8 +158,13 @@ const styles = StyleSheet.create({
   time: {
     color: '#575757',
     fontSize: 10,
-  }
-
+  },
+  backButton: {
+    display: 'flex',
+    position: 'absolute',
+    left: 15,
+    paddingTop: Platform.select({ ios: 30 })
+  },
 });
 
 export default ModalView;

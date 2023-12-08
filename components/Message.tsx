@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Platform, TouchableOpacity, Pressable, Modal } from 'react-native';
-import { Ionicons } from "@expo/vector-icons";
-import {MessageObjectParams} from "./MessageObject";
+import React, {useState} from 'react';
+import {Platform, Pressable, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {Ionicons} from "@expo/vector-icons";
+import MessageObject, {MessageObjectParams} from "./MessageObject";
+import ModalView from "./ModalView";
+import MessageObjectCollection from "./MessageObjectCollection";
+import {useMessageContext} from "../contexts/MessageContext";
 
 interface MessageProps {
   messageIconName: string;
@@ -9,8 +12,11 @@ interface MessageProps {
   messageTitle: string;
   messageText: string;
   date: string;
-  messageObject: MessageObjectParams;
-  save: (id: string, type: string) => void;
+  messageObject: MessageObject;
+  readStatus: boolean;
+  toBookmarks: MessageObjectCollection;
+  toggleSavedStatus: (id: number) => void;
+  updateSavedMessages: () => void;
 }
 
 const Message: React.FC<MessageProps> = ({
@@ -20,10 +26,14 @@ const Message: React.FC<MessageProps> = ({
                                            messageText,
                                            date,
                                            messageObject,
-                                           save
+                                           readStatus,
+                                           toBookmarks,
+                                           toggleSavedStatus,
+                                           updateSavedMessages
                                          }) => {
   const [bookmarkState, setBookmarkState] = useState(messageObject.isSaved);
   const [modalVisible, setModalVisible] = useState(false);
+  const [read, setRead] = useState(readStatus);
 
   const showModal = () => {
     setModalVisible(true);
@@ -33,27 +43,45 @@ const Message: React.FC<MessageProps> = ({
     setModalVisible(false);
   };
 
+  React.useEffect(() => {
+    console.log(toBookmarks.messages);
+  }, [toBookmarks.messages]);
+
   return (
     <>
-      <Pressable onPress={() => console.log('pressed')} style={[styles.container, styles.shadow]}>
-        <View style={styles.flexing}>n
+      <Pressable onPress={() => {
+        setModalVisible(true);
+        setRead(true);
+        messageObject.setIsRead();
+      }} style={[styles.container, styles.shadow]}>
+        <View style={styles.flexing}>
           <View style={styles.flexing}>
-            <Ionicons
+            {!read && <Ionicons
               name={'ellipse'}
               size={8}
               color={'#0386D0'}
-            />
+            />}
             <Ionicons
+              // @ts-ignore
               name={messageIconName}
               size={24}
               color={messageIconColor}
             />
-            <Text style={styles.title}>
+            <Text style={[read ? styles.haveRead : styles.notRead, styles.title]}>
               {messageTitle.length > 25 ? messageTitle.slice(0, 25) + ('...') : messageTitle}
             </Text>
           </View>
-          <TouchableOpacity style={{ width: 30, height: 30 }} onPress={() => {
+          <TouchableOpacity style={{width: 30, height: 30}} onPress={() => {
             setBookmarkState(prevState => !prevState);
+            toggleSavedStatus(messageObject.id);
+            updateSavedMessages();
+            // if (readStatus) {
+            //   toBookmarks.addMessage(messageObject);
+            // }
+            // else {
+            //   toBookmarks.removeMessageById(messageObject.id);
+            // }
+            // console.log(toBookmarks.messages)
           }}>
             <Ionicons
               name={bookmarkState ? 'bookmark' : 'bookmark-outline'}
@@ -63,9 +91,23 @@ const Message: React.FC<MessageProps> = ({
           </TouchableOpacity>
         </View>
         <Text
-          style={styles.message}>{messageText.length > 250 ? messageText.slice(0, 250) + ('...') : messageText}</Text>
+          style={[read ? styles.haveRead : styles.notRead, styles.message]}>{messageText.length > 250 ? messageText.slice(0, 250) + ('...') : messageText}</Text>
         <Text style={styles.time}>{date}</Text>
       </Pressable>
+      {modalVisible &&
+        <ModalView
+          key={Date.now()}
+          messageIconName={messageIconName}
+          messageIconColor={messageIconColor}
+          messageTitle={messageTitle}
+          messageObject={messageObject}
+          messageText={messageText}
+          date={date}
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          bookmarkState={bookmarkState}
+          setBookmarkState={setBookmarkState}
+        />}
     </>
   );
 };
@@ -89,7 +131,7 @@ const styles = StyleSheet.create({
     ...Platform.select({
       ios: {
         shadowColor: 'rgba(0, 0, 0, 0.45)',
-        shadowOffset: { width: 0, height: 0 },
+        shadowOffset: {width: 0, height: 0},
         shadowOpacity: 0.45,
         shadowRadius: 2,
       },
@@ -100,18 +142,21 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    fontWeight: "bold"
   },
   message: {
     fontSize: 14,
-    fontWeight: "bold",
     textAlign: "justify",
   },
   time: {
     color: '#575757',
     fontSize: 10,
+  },
+  haveRead: {
+    fontWeight: "normal",
+  },
+  notRead: {
+    fontWeight: "bold",
   }
-
-})
+});
 
 export default Message;

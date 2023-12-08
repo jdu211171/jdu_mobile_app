@@ -7,8 +7,8 @@ export default class MessageObjectCollection {
     this.messages = messages;
   }
 
-  addMessage(messageParams: MessageObjectParams) {
-    this.messages.push(new MessageObject(messageParams));
+  addMessage(messageParams: MessageObject) {
+    this.messages.push(messageParams);
   }
 
   addMessages(messageParamsArray: MessageObjectParams[]) {
@@ -75,13 +75,3 @@ export default class MessageObjectCollection {
     return this.messages;
   }
 }
-
-const hello = new MessageObjectCollection([]);
-hello.addMessage({
-  id: 1,
-  title: 'hello',
-  description: 'john',
-  priority: 1,
-  message_type_id: 1,
-  updated_date: "2023-12-12"
-})

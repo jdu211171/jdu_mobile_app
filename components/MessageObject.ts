@@ -4,7 +4,7 @@ export interface MessageObjectParams {
   description: string,
   priority: number,
   message_type_id: number,
-  updated_date: string,
+  updatedDate: string,
   isRead?: boolean,
   isReadSent?: boolean,
   isSaved?: boolean,
@@ -17,7 +17,7 @@ export default class MessageObject {
   readonly title: string;
   readonly description: string;
   readonly message_type_id: number;
-  readonly updatedDate: string | undefined;
+  readonly updatedDate: string;
   priority: number;
   isRead: boolean;
   isReadSent: boolean;
@@ -31,7 +31,7 @@ export default class MessageObject {
       description,
       priority,
       message_type_id,
-      updated_date,
+      updatedDate,
       isRead = false,
       isReadSent = false,
       isSaved = false,
@@ -47,7 +47,7 @@ export default class MessageObject {
     this.isReadSent = isReadSent;
     this.isSaved = isSaved;
     this.isSavedSent = isSavedSent;
-    this.updatedDate = updated_date;
+    this.updatedDate = updatedDate;
   }
 
   setIsRead() {

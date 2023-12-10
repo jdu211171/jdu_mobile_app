@@ -43,10 +43,6 @@ const Message: React.FC<MessageProps> = ({
     setModalVisible(false);
   };
 
-  React.useEffect(() => {
-    console.log(toBookmarks.messages);
-  }, [toBookmarks.messages]);
-
   return (
     <>
       <Pressable onPress={() => {
@@ -74,14 +70,8 @@ const Message: React.FC<MessageProps> = ({
           <TouchableOpacity style={{width: 30, height: 30}} onPress={() => {
             setBookmarkState(prevState => !prevState);
             toggleSavedStatus(messageObject.id);
-            updateSavedMessages();
-            // if (readStatus) {
-            //   toBookmarks.addMessage(messageObject);
-            // }
-            // else {
-            //   toBookmarks.removeMessageById(messageObject.id);
-            // }
-            // console.log(toBookmarks.messages)
+            toBookmarks.addMessage(messageObject);
+            console.log(toBookmarks);
           }}>
             <Ionicons
               name={bookmarkState ? 'bookmark' : 'bookmark-outline'}

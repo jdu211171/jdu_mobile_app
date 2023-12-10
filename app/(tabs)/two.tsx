@@ -6,17 +6,18 @@ import MessageObject from "../../components/MessageObject";
 
 export default function TabTwoScreen() {
 
-  const {pathname, savedMessages} = useMessageContext();
+  const {pathname, savedMessages, toggleSavedStatus, updateSavedMessages} = useMessageContext();
   const [refreshing, setRefreshing] = useState(false);
   const [savedMessagesData, setSavedMessagesData] = useState<MessageObject[]>([]);
-    useEffect(() => {
-      setSavedMessagesData(savedMessages.messages);
-      console.log('saved');
-    }, [savedMessages.messages]);
 
   const onRefresh = () => {
     console.log('refreshed');
   }
+
+  useEffect(() => {
+    console.log(savedMessages);
+  }, [pathname]);
+
   return (
     <ScrollView
       contentContainerStyle={{
@@ -35,8 +36,6 @@ export default function TabTwoScreen() {
     >
       {
         savedMessagesData
-          .slice()
-          .reverse()
           .map((messageObject) => (
             <Message
               key={messageObject.id}
@@ -47,7 +46,9 @@ export default function TabTwoScreen() {
               date={messageObject.updatedDate}
               messageObject={messageObject}
               readStatus={messageObject.isRead}
-              toBookmarks={savedMessages}/>
+              toBookmarks={savedMessages}
+              toggleSavedStatus={toggleSavedStatus}
+              updateSavedMessages={updateSavedMessages}/>
           ))
       }
     </ScrollView>

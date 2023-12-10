@@ -49,6 +49,8 @@ export default function RenderMessages() {
     })();
   }, []);
 
+  console.log(savedMessages, 'here we are');
+
   return (
     <ScrollView
       contentContainerStyle={{

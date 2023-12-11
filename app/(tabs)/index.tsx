@@ -1,10 +1,11 @@
 import * as React from "react";
 import {StyleSheet} from "react-native";
 import RenderMessages from '../../components/RenderMessages';
+import {StatusBar} from "expo-status-bar";
 
 export default function Messages() {
   return (
-    <RenderMessages />
+      <RenderMessages />
   );
 }
 

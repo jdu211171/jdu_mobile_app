@@ -3,31 +3,33 @@ import {useMessageContext} from "../contexts/MessageContext";
 import React, {useEffect, useState} from "react";
 import Message from "./Message";
 import MessageObject, {MessageObjectParams} from "./MessageObject";
+import {usePathname} from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {StatusBar} from "expo-status-bar";
 
 export default function RenderMessages() {
 
   const {
     allMessages,
     savedMessages,
-    fetchMessagesFromAPI,
-    setAllMessageFromApi,
-    setAllMessages,
-    loadMessagesFromAsyncStorage,
-    saveMessagesToAsyncStorage,
-    toggleSavedStatus,
-    updateSavedMessages
+    setSavedStatus,
+    removeSavedStatus,
+    fetchFromAPI,
+    saveToAsyncStorage,
+    createMessageObjectCollection,
+    loadFromAsyncStorage
   } = useMessageContext();
 
   const [refreshing, setRefreshing] = useState(false);
   const [messagesData, setMessagesData] = useState<MessageObject[]>([]);
-
+  const pathname = usePathname();
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    fetchMessagesFromAPI("https://wfjz3m1ilh.execute-api.eu-north-1.amazonaws.com/default/api/messages")
+    fetchFromAPI("https://wfjz3m1ilh.execute-api.eu-north-1.amazonaws.com/default/api/messages")
       .then((r) => {
-        // @ts-ignore
-        setAllMessages((setAllMessageFromApi(r.data)));
-        saveMessagesToAsyncStorage("all_messages", allMessages.messages);
+        allMessages.messages = [];
+        allMessages.addMessages(createMessageObjectCollection(r.data));
+        saveToAsyncStorage("all_messages", allMessages.messages);
       })
       .catch((error) => {
         console.error("Error fetching messages:", error);
@@ -38,9 +40,9 @@ export default function RenderMessages() {
   useEffect(() => {
     (async () => {
       try {
-        const storedMessages = await loadMessagesFromAsyncStorage("all_messages");
+        const storedMessages = await loadFromAsyncStorage("all_messages");
         if (typeof storedMessages === "string") {
-          setAllMessages(JSON.parse(storedMessages).map((messageParams: MessageObjectParams) => new MessageObject(messageParams)));
+          allMessages.messages = (JSON.parse(storedMessages).map((messageParams: MessageObjectParams) => new MessageObject(messageParams)));
           setMessagesData(allMessages.messages);
         }
       } catch (error) {
@@ -49,7 +51,14 @@ export default function RenderMessages() {
     })();
   }, []);
 
-  console.log(savedMessages, 'here we are');
+  useEffect(() => {
+    if (pathname === '/') setMessagesData(allMessages.messages);
+    saveToAsyncStorage("all_messages", allMessages.messages);
+  }, [pathname]);
+
+
+  // AsyncStorage.removeItem("all_messages");
+  // AsyncStorage.removeItem("saved_messages");
 
   return (
     <ScrollView
@@ -83,12 +92,14 @@ export default function RenderMessages() {
                 messageObject={messageObject}
                 readStatus={messageObject.isRead}
                 toBookmarks={savedMessages}
-                toggleSavedStatus={toggleSavedStatus}
-                updateSavedMessages={updateSavedMessages}
+                setSavedStatus={setSavedStatus}
+                removeSavedStatus={removeSavedStatus}
+                saveToAsyncStorage={saveToAsyncStorage}
               />
             );
           })
       }
+      <StatusBar style={"light"} />
     </ScrollView>
   );
 }

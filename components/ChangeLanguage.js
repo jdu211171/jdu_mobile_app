@@ -5,24 +5,13 @@ import Toast from "react-native-root-toast";
 import {useLanguageContext} from "../contexts/LanguageContext";
 export const ChangeLanguage = () => {
   const [isModalVisible, setModalVisible] = React.useState(true);
-  const userLanguage = useLanguageContext();
-  
+  const {changeLanguage} = useLanguageContext();
   
   const handlePress = async (userPreferredLanguage) => {
     if (typeof userPreferredLanguage === 'string') {
       try {
-        userLanguage.changeLanguage(userPreferredLanguage);
-        console.log('language changed');
+        changeLanguage(userPreferredLanguage);
         setModalVisible(false);
-        // Toast.show('アプリを再起動した後、言語を変更すると影響が出る\n' +
-        //                     'changing language affects after relaunching app', {
-        //   duration: Toast.durations.LONG,
-        //   position: Toast.positions.BOTTOM,
-        //   shadow: true,
-        //   animation: true,
-        //   hideOnPress: true,
-        //   delay: 0,
-        // });
       } catch (e) {
         console.log(e);
       }
@@ -32,6 +21,8 @@ export const ChangeLanguage = () => {
   return (
       <Modal visible={isModalVisible}>
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center', rowGap: 20}}>
+          <Text>言語を選択してください：</Text>
+          <Text>Tilni tanlang:</Text>
           <Text>Select a language:</Text>
           <Text style={styles.language} onPress={() => handlePress('jp')}>日本語</Text>
           <Text style={styles.language} onPress={() => handlePress('uzb')}>O'zbekcha</Text>

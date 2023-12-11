@@ -1,4 +1,4 @@
-import {Text, View} from "react-native";
+import {View} from "react-native";
 import * as React from "react";
 import ContactInfo from "../../components/ContactInfo";
 

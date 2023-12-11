@@ -1,23 +1,33 @@
 import React from "react";
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import {Link, Redirect, Tabs} from 'expo-router';
-import {Pressable, Text, useColorScheme} from 'react-native';
+import {Redirect, Tabs} from 'expo-router';
+import {Text, useColorScheme, View} from 'react-native';
 
 import Colors from '../../constants/Colors';
 import {useSession} from "../../contexts/ctx";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import {useLanguageContext} from "../../contexts/LanguageContext";
 
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
+/*
 function TabBarIcon(props: {
   name: React.ComponentProps<typeof FontAwesome>['name'];
   color: string;
 }) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
-
+*/
+/*
+function TabBarIcon(props: {
+  name: React.ComponentProps<typeof Ionicons>['name'];
+  color: string;
+  focused: boolean;
+}) {
+  return props.focused ?
+    <View style={{ height: 34, width: 34, backgroundColor: '#ffffff', borderRadius: 34 }}><Ionicons size={28} style={{ marginBottom: -3 }} {...props} /></View>
+    : <Ionicons size={28} style={{ marginBottom: -3 }} {...props} />;
+}
+*/
 export default function TabLayout() {
+  const {translations} = useLanguageContext();
   const colorScheme = useColorScheme();
   const sessionContext = useSession();
   if (sessionContext?.isLoading) {
@@ -29,49 +39,66 @@ export default function TabLayout() {
 
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, size }) => {
+          const icons: { [key: string]: React.ComponentProps<typeof Ionicons>['name'] } = {
+            'index': 'ios-mail',
+            'two': 'bookmark',
+            'links': 'link',
+            'settings': 'settings',
+          };
+          // @ts-ignore
+          const iconName: React.ComponentProps<typeof Ionicons>['name'] = focused ? icons[route.name] : `${icons[route.name]}-outline`;
+          const iconColor = focused ? "#0251B2" : "#fff";
+          return focused ? (
+            <View
+              style={{
+                backgroundColor: "#fff",
+                padding: 10,
+                width: 44,
+                height: 44,
+                borderRadius: 22,
+              }}
+            >
+              <Ionicons name={iconName} size={size} color={iconColor} />
+            </View>
+          ) : (<Ionicons name={iconName} size={size} color={iconColor} />);
+        },
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-      }}>
+        tabBarShowLabel: false,
+        headerStyle: {
+          backgroundColor: "#1A2857",
+        },
+        headerTitleStyle: {
+          color: "#ffffff",
+        },
+        headerTitleAlign: "center",
+        tabBarStyle: {
+          backgroundColor: "#1A2857"
+        },
+      })}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Messages',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
+          title: translations.xabarlar,
         }}
       />
       <Tabs.Screen
         name="two"
         options={{
-          title: 'Saved Messages',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: translations.saqlanganlar,
         }}
       />
       <Tabs.Screen
         name="links"
         options={{
-          title: 'Links',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: translations.linklar,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
-          title: 'Settings Page',
-          tabBarIcon: ({ color }) => <TabBarIcon name="code" color={color} />,
+          title: translations.sozlamalar,
         }}
       />
     </Tabs>

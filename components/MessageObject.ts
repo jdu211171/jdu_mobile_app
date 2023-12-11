@@ -58,8 +58,12 @@ export default class MessageObject {
     this.isRead = true;
   }
 
-  toggleIsSaved() {
-    this.isSaved = !this.isSaved;
+  setIsSaved() {
+    this.isSaved = true;
+  }
+
+  removeIsSaved() {
+    this.isSaved = false;
   }
 
   setIsSavedSent() {

@@ -17,7 +17,7 @@ export default {
     "facebook_sahifasi": "facebookページ",
     "instagram_sahifasi": "instagramページ",
     "telegram_sahifasi": "telegramチャンネル",
-    "twitter_sahifasi": "twitter(x)ページ"
+    "twitter_sahifasi": "twitter(X)ページ"
   },
   "uzb": {
     "xabarlar": "Xabarlar",

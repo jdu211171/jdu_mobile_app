@@ -41,7 +41,7 @@ export default class MessageObjectCollection {
   markMessageAsSaved(id: number) {
     const message = this.getMessageById(id);
     if (message) {
-      message.toggleIsSaved();
+      message.setIsSaved();
     }
   }
 

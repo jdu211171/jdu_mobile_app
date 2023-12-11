@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, Pressable, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import {Ionicons} from "@expo/vector-icons";
-import MessageObject, {MessageObjectParams} from "./MessageObject";
+import MessageObject from "./MessageObject";
 import ModalView from "./ModalView";
 import MessageObjectCollection from "./MessageObjectCollection";
-import {useMessageContext} from "../contexts/MessageContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface MessageProps {
   messageIconName: string;
@@ -15,8 +15,9 @@ interface MessageProps {
   messageObject: MessageObject;
   readStatus: boolean;
   toBookmarks: MessageObjectCollection;
-  toggleSavedStatus: (id: number) => void;
-  updateSavedMessages: () => void;
+  setSavedStatus: (id: number) => void;
+  removeSavedStatus: (id: number) => void;
+  saveToAsyncStorage: (key: string, data: any) => Promise<void>;
 }
 
 const Message: React.FC<MessageProps> = ({
@@ -28,12 +29,17 @@ const Message: React.FC<MessageProps> = ({
                                            messageObject,
                                            readStatus,
                                            toBookmarks,
-                                           toggleSavedStatus,
-                                           updateSavedMessages
+                                           setSavedStatus,
+                                           removeSavedStatus,
+                                           saveToAsyncStorage
                                          }) => {
-  const [bookmarkState, setBookmarkState] = useState(messageObject.isSaved);
+  const [bookmarkState, setBookmarkState] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [read, setRead] = useState(readStatus);
+
+  useEffect(() => {
+    setBookmarkState(toBookmarks.messages.includes(messageObject));
+  }, []);
 
   const showModal = () => {
     setModalVisible(true);
@@ -68,10 +74,12 @@ const Message: React.FC<MessageProps> = ({
             </Text>
           </View>
           <TouchableOpacity style={{width: 30, height: 30}} onPress={() => {
+            !bookmarkState ? setSavedStatus(messageObject.id) : removeSavedStatus(messageObject.id);
+            toBookmarks.getMessageById(messageObject.id)?.setIsSaved();
+            saveToAsyncStorage("saved_messages", toBookmarks.messages);
             setBookmarkState(prevState => !prevState);
-            toggleSavedStatus(messageObject.id);
-            toBookmarks.addMessage(messageObject);
-            console.log(toBookmarks);
+            // console.log('savedMessages: ', toBookmarks);
+            // messageObject.setIsSaved();
           }}>
             <Ionicons
               name={bookmarkState ? 'bookmark' : 'bookmark-outline'}

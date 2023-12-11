@@ -10,7 +10,7 @@ import {ChangeLanguage} from "./ChangeLanguage";
 // import {TranslationsContext} from "./LanguageSelectionScreen";
 
 const ContactInfo = () => {
-    const userLanguage = useLanguageContext();
+    const {translations, language} = useLanguageContext();
     const sessionContext = useSession();
     const [contactInfo, setContactInfo] = useState({
         name: "Jahongir Saydaxmatov",
@@ -32,19 +32,19 @@ const ContactInfo = () => {
     return (
         <View style={styles.container}>
             <View style={styles.row}>
-                <Text style={styles.infoLabel}>ism:</Text>
+                <Text style={styles.infoLabel}>{translations.ism}:</Text>
                 <Text style={styles.infoValue}>Jahongir</Text>
             </View>
             <View style={styles.row}>
-                <Text style={styles.infoLabel}>familiya:</Text>
+                <Text style={styles.infoLabel}>{translations.familiya}:</Text>
                 <Text style={styles.infoValue}>Saydaxmatov</Text>
             </View>
             <View style={styles.row}>
-                <Text style={styles.infoLabel}>id raqami:</Text>
+                <Text style={styles.infoLabel}>{translations.id_raqami}:</Text>
                 <Text style={styles.infoValue}>210285</Text>
             </View>
             <View style={styles.row}>
-                <Text style={styles.infoLabel}>telefon raqami:</Text>
+                <Text style={styles.infoLabel}>{translations.telefon_raqami}:</Text>
                 <Text style={styles.infoValue}>998 (97) 665 35 28</Text>
             </View>
 
@@ -87,7 +87,7 @@ const ContactInfo = () => {
                         size={24}
                         color={'#575757'}
                     />
-                    <Text style={{ padding: 10 }}>Raqamni o'zgartirish</Text>
+                    <Text style={{ padding: 10 }}>{translations.raqamni_ozgartirish}</Text>
                 </View>
             </View>
 
@@ -98,7 +98,7 @@ const ContactInfo = () => {
                         size={24}
                         color={'#575757'}
                     />
-                    <Text style={{ padding: 10 }}>Parolni o'zgartirish</Text>
+                    <Text style={{ padding: 10 }}>{translations.parolni_ozgartirish}</Text>
                 </View>
             </View>
             
@@ -136,11 +136,11 @@ const ContactInfo = () => {
                             size={24}
                             color={'#575757'}
                         />
-                        <Text style={{ padding: 10 }}>Tilni o'zgartirish</Text>
+                        <Text style={{ padding: 10 }}>{translations.tilni_ozgartirish}</Text>
                     </View>
                     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         {/*<Text>{userLanguage.language === 'jp' ? '日本語' : userLanguage.language === 'eng' ? 'english' : 'uzbek'}</Text>*/}
-                        <Text>o'zbek</Text>
+                        <Text>{language === 'jp' ? '日本語 ' : language === 'uzb' ? 'o\'zbek' : 'english'}</Text>
                         <Ionicons
                             name={'chevron-forward'}
                             size={15}
@@ -158,7 +158,7 @@ const ContactInfo = () => {
                         size={24}
                         color={'red'}
                     />
-                    <Text onPress={() => {sessionContext.signOut()}} style={{ padding: 10, color: 'red' }}>Akkountdan chiqish</Text>
+                    <Text onPress={() => {sessionContext.signOut()}} style={{ padding: 10, color: 'red' }}>{translations.akkountdan_chiqish}</Text>
                 </View>
             </View>
         </View>

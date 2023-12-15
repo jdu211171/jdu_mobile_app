@@ -14,7 +14,7 @@ interface MessageProps {
   date: string;
   messageObject: MessageObject;
   readStatus: boolean;
-  toBookmarks: MessageObjectCollection;
+  savedMessages: number[];
   setSavedStatus: (id: number) => void;
   removeSavedStatus: (id: number) => void;
   saveToAsyncStorage: (key: string, data: any) => Promise<void>;
@@ -28,7 +28,7 @@ const Message: React.FC<MessageProps> = ({
                                            date,
                                            messageObject,
                                            readStatus,
-                                           toBookmarks,
+                                           savedMessages,
                                            setSavedStatus,
                                            removeSavedStatus,
                                            saveToAsyncStorage
@@ -38,11 +38,14 @@ const Message: React.FC<MessageProps> = ({
   const [read, setRead] = useState(readStatus);
 
   useEffect(() => {
-    setBookmarkState(toBookmarks.messages.includes(messageObject));
-  }, []);
+    setBookmarkState(messageObject.isSaved);
+    setRead(messageObject.isRead);
+  }, [messageObject.isSaved, messageObject.isRead]);
 
   const showModal = () => {
     setModalVisible(true);
+    setRead(true);
+    messageObject.setIsRead();
   };
 
   const closeModal = () => {
@@ -52,9 +55,7 @@ const Message: React.FC<MessageProps> = ({
   return (
     <>
       <Pressable onPress={() => {
-        setModalVisible(true);
-        setRead(true);
-        messageObject.setIsRead();
+        showModal();
       }} style={[styles.container, styles.shadow]}>
         <View style={styles.flexing}>
           <View style={styles.flexing}>
@@ -74,12 +75,13 @@ const Message: React.FC<MessageProps> = ({
             </Text>
           </View>
           <TouchableOpacity style={{width: 30, height: 30}} onPress={() => {
-            !bookmarkState ? setSavedStatus(messageObject.id) : removeSavedStatus(messageObject.id);
-            toBookmarks.getMessageById(messageObject.id)?.setIsSaved();
-            saveToAsyncStorage("saved_messages", toBookmarks.messages);
+            // !bookmarkState ? setSavedStatus(messageObject.id) : removeSavedStatus(messageObject.id);
+            if (!bookmarkState) {
+              setSavedStatus(messageObject.id);
+            } else {
+              removeSavedStatus(messageObject.id);
+            }
             setBookmarkState(prevState => !prevState);
-            // console.log('savedMessages: ', toBookmarks);
-            // messageObject.setIsSaved();
           }}>
             <Ionicons
               name={bookmarkState ? 'bookmark' : 'bookmark-outline'}

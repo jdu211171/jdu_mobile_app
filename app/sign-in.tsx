@@ -1,98 +1,154 @@
 import {router} from 'expo-router';
-import {Linking, Platform, Text, TextInput, View} from 'react-native';
+import {Linking, StyleSheet, Text, TextInput, View} from 'react-native';
 import {useSession} from "../contexts/ctx";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as React from "react";
+import {useEffect, useState} from "react";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import * as WebBrowser from "expo-web-browser";
 import {Image} from 'expo-image';
+import {useLanguageContext} from "../contexts/LanguageContext";
+import CustomButton from "../components/CustomButton";
 
 export default function SignIn() {
-  const sessionContext = useSession()
+  const sessionContext = useSession();
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  
-  
+  const {translations} = useLanguageContext();
+  const [buttonState, setButtonState] = useState(false);
+  const [mailError, setMailError] = useState(false);
+  const [pswError, setPswError] = useState(false);
+
+  useEffect(() => {
+    (() => sessionContext?.loadFromAsyncStorage('user_info').then(r => r ? JSON.parse(r).responsiblePerson.email : '').then(setEmail))();
+  }, []);
+
   const handleSubmit = async () => {
+    setButtonState(true);
     try {
-      sessionContext?.signIn();
-      const token = await sessionContext?.sendCredentials(email, password, 'https://5gt6i3c4bh.execute-api.eu-north-1.amazonaws.com/default/api/signIn/');
-      await saveToAsyncStorage(token);
-      router.replace('/');
-    } catch (error) {
-      console.error('Authentication failed:', error);
-      // Handle authentication error as needed (e.g., show an error message)
+      await sessionContext?.login(
+        email.toString(),
+        password.toString(),
+        'https://ktd5kacfz5.execute-api.ap-northeast-1.amazonaws.com/default/api/auth/signIn'
+      ).then(async r => {
+        if (r.status !== 200) {
+          setButtonState(false);
+          setMailError(true);
+          setPswError(true);
+          setEmail('');
+          setPassword('');
+        } else {
+          const response = await r.json();
+          sessionContext?.signIn(response.token);
+          sessionContext?.saveToAsyncStorage('user_info', response).then(() => router.replace('/'));
+        }
+      });
+
+    } catch (e) {
+      setButtonState(false);
+      console.log(e);
     }
   };
-  
-  const saveToAsyncStorage = async (token: string | undefined) => {
-    await AsyncStorage.setItem('token', token || ''); // use `token || ''` to handle the case where `token` is undefined
-  }
-  
+
   return (
-    <View style={{flex: 1, paddingLeft: 20, paddingRight: 20, marginTop: 20, alignContent: 'center', justifyContent: 'center'}}>
-      <View style={{alignSelf: 'center'}}>
-        <Image source={require('../assets/images/jdu_logo.png')} style={{width: 180, height: 180}}/>
+    <View style={styles.container}>
+      <View style={styles.center}>
+        <Image source={require('../assets/images/jdu_logo.png')} style={styles.logo}/>
       </View>
-      <Text style={{fontSize: 30, fontWeight: 'bold', textAlign: 'center'}}>Kirish</Text>
-      <Text style={{display: 'flex', fontSize: 14, marginVertical: 10, textAlign: 'center', color: '#6B5E5E'}}>Ushbu
-        dasturga kirish orqali siz bizning shart va siyosatimizga rozilik bildirasiz</Text>
-      <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'center'}}>
-        <Ionicons
-          style={{borderBottomWidth: 1, borderColor: '#ccc', padding: 4}}
-          name={'ios-mail'}
-          size={28}
-          color={'#ccc'}/>
-        <TextInput
-          style={{height: 40, borderBottomWidth: 1, borderColor: '#ccc', padding: 10, marginVertical: 10, width: '70%'}}
-          placeholder="E-pochta manzili"
-          value={email}
-          onChangeText={setEmail}
-        />
+      <Text style={styles.title}>{translations.login}</Text>
+      <Text style={styles.subtitle}>{translations.login_text}</Text>
+      <View style={styles.row}>
+        <Ionicons style={[styles.icon, mailError && styles.error]} name={'ios-mail'} size={28} color={'#ccc'}/>
+        <TextInput style={[styles.input, mailError && styles.error]} placeholder={translations.login_mail} value={email}
+                   onChangeText={text => {
+                     setEmail(text);
+                     setMailError(false);
+                   }}
+                   inputMode={"email"}/>
       </View>
-      <View style={{display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'center'}}>
-        <Ionicons
-          style={{borderBottomWidth: 1, borderColor: '#ccc', padding: 4}}
-          name={'ios-lock-closed'}
-          size={28}
-          color={'#ccc'}/>
-        <TextInput
-          secureTextEntry={true}
-          style={{height: 40, borderBottomWidth: 1, borderColor: '#ccc', padding: 10, marginVertical: 10, width: '70%'}}
-          placeholder="Parol"
-          value={password}
-          onChangeText={setPassword}
-        />
+      <Text style={[styles.errorStyle, mailError ? styles.error : styles.disappear]}>{translations.login_error}</Text>
+      <View style={styles.row}>
+        <Ionicons style={[styles.icon, pswError && styles.error]} name={'ios-lock-closed'} size={28} color={'#ccc'}/>
+        <TextInput secureTextEntry={true} style={[styles.input, pswError && styles.error]}
+                   placeholder={translations.login_password}
+                   value={password}
+                   onChangeText={text => {
+                     setPassword(text);
+                     setPswError(false);
+                   }}/>
       </View>
-      <Text
-        style={{color: '#0386D0', fontWeight: '500', paddingTop: 15, paddingBottom: 15, textAlign: 'right'}}
-        onPress={() => {
-          if (Platform.OS !== 'web') {
-            // Open the link in an in-app browser.
-            WebBrowser.openBrowserAsync('https://www.example.com');
-          } else {
-            // On web, launch the link in a new tab.
-            Linking.openURL('https://www.example.com');
-          }
-        }}
-      >
-        Parolni unutdingizmi?
+      <Text style={[styles.errorStyle, pswError ? styles.error : styles.disappear]}>{translations.login_error}</Text>
+      <Text style={styles.link} onPress={() => {
+          Linking.openURL('https://www.example.com');
+      }}>
+        {translations.login_help}
       </Text>
-      <Text
-        style={{
-          color: '#fff',
-          fontWeight: 'bold',
-          fontSize: 20,
-          textAlign: 'center',
-          padding: 10,
-          backgroundColor: '#1A2857',
-          borderRadius: 10,
-          overflow: 'hidden'
-        }}
-        onPress={handleSubmit}
-      >
-        Kirish
-      </Text>
+      <CustomButton disabled={buttonState} customFunction={handleSubmit} title={translations.login_button}/>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingLeft: 20,
+    paddingRight: 20,
+    marginTop: 20,
+    alignContent: 'center',
+    justifyContent: 'center',
+  },
+  errorStyle: {
+    color: 'red',
+    textAlign: 'center',
+  },
+  center: {
+    alignSelf: 'center',
+  },
+  logo: {
+    width: 180,
+    height: 180,
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  subtitle: {
+    display: 'flex',
+    fontSize: 14,
+    marginVertical: 10,
+    textAlign: 'center',
+    color: '#6B5E5E',
+  },
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'center',
+  },
+  icon: {
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+    padding: 4.5,
+  },
+  input: {
+    height: 40,
+    borderBottomWidth: 1,
+    borderColor: '#ccc',
+    padding: 10,
+    marginVertical: 10,
+    width: '70%',
+  },
+  link: {
+    color: '#0386D0',
+    fontWeight: '500',
+    paddingTop: 15,
+    paddingBottom: 15,
+    textAlign: 'right',
+  },
+  error: {
+    borderColor: 'red',
+  },
+  disappear: {
+    display: "none",
+  }
+});

@@ -3,35 +3,42 @@ import {RefreshControl, ScrollView} from "react-native";
 import {useMessageContext} from "../../contexts/MessageContext";
 import {usePathname} from "expo-router";
 import Message from "../../components/Message";
-import MessageObject, {MessageObjectParams} from "../../components/MessageObject";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function TabTwoScreen() {
+  const [savedData, setSavedData] = useState<number[]>([]);
   const pathname = usePathname();
-  const {savedMessages, setSavedMessages, saveToAsyncStorage, loadFromAsyncStorage, setSavedStatus, removeSavedStatus, updateSavedMessages} = useMessageContext();
-  const [savedMessagesData, setSavedMessagesData] = useState<MessageObject[]>([]);
+  let {
+    savedMessages,
+    allMessages,
+    saveToAsyncStorage,
+    setSavedStatus,
+    removeSavedStatus,
+  } = useMessageContext();
+
   const [refreshing, setRefreshing] = useState(false);
   const onRefresh = () => {
+    // console.log(savedMessages);
+    savedMessages = allMessages.getSavedMessages().map(message => message.id);
+    setSavedData(savedMessages);
+    // console.log(savedMessages);
     console.log('refreshed');
   }
 
   useEffect(() => {
-    (async () => {
-      try {
-        const storedMessages = await loadFromAsyncStorage("saved_messages");
-        if (typeof storedMessages === "string") {
-          savedMessages.messages = (JSON.parse(storedMessages).map((messageParams: MessageObjectParams) => new MessageObject(messageParams)));
-          setSavedMessagesData(savedMessages.messages);
-        }
-      } catch (error) {
-        console.error("Error loading messages from AsyncStorage:", error);
-      }
-    })();
-  }, []);
+    savedMessages = allMessages.getSavedMessages().map(message => message.id);
+    setSavedData(savedMessages);
+    saveToAsyncStorage("all_messages", allMessages.messages);
+  }, [savedMessages, allMessages, pathname]);
 
-  useEffect(() => {
-    if (pathname === '/two') setSavedMessagesData(savedMessages.messages);
-    saveToAsyncStorage("saved_messages", savedMessages.messages);
-  }, [pathname]);
+
+//   const clearAsyncStorage = async () => {
+//     await AsyncStorage.clear();
+//     console.log('AsyncStorage successfully cleared');
+//   };
+//
+// // Call the function
+//   clearAsyncStorage();
 
   return (
     <ScrollView
@@ -50,25 +57,31 @@ export default function TabTwoScreen() {
       }
     >
       {
-        savedMessages.messages
-          .slice()
-          .reverse()
-          .map((messageObject) => (
-            <Message
-              key={messageObject.id}
-              messageIconName="information-circle"
-              messageIconColor="#0386D0"
-              messageTitle={messageObject.title}
-              messageText={messageObject.description}
-              date={messageObject.updatedDate}
-              messageObject={messageObject}
-              readStatus={messageObject.isRead}
-              toBookmarks={savedMessages}
-              setSavedStatus={setSavedStatus}
-              removeSavedStatus={removeSavedStatus}
-              saveToAsyncStorage={saveToAsyncStorage}
-            />
-          ))
+        savedData
+          .map((id: number) => {
+            const messageObject = allMessages.getMessageById(id);
+            if (!messageObject) {
+              // Handle the case where the message object is not found for the given ID
+              return null;
+            }
+
+            return (
+              <Message
+                key={messageObject.id}
+                messageIconName="information-circle"
+                messageIconColor="#0386D0"
+                messageTitle={messageObject.title}
+                messageText={messageObject.description}
+                date={messageObject.sent_at}
+                messageObject={messageObject}
+                readStatus={messageObject.isRead}
+                savedMessages={savedMessages}
+                setSavedStatus={setSavedStatus}
+                removeSavedStatus={removeSavedStatus}
+                saveToAsyncStorage={saveToAsyncStorage}
+              />
+            );
+          })
       }
     </ScrollView>
   );

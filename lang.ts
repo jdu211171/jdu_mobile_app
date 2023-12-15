@@ -17,7 +17,14 @@ export default {
     "facebook_sahifasi": "facebookページ",
     "instagram_sahifasi": "instagramページ",
     "telegram_sahifasi": "telegramチャンネル",
-    "twitter_sahifasi": "twitter(X)ページ"
+    "twitter_sahifasi": "twitter(X)ページ",
+    "login": "ログイン",
+    "login_text": "アプリケーションを使用することにより、お客様は当社の規約とポリシーに同意したものとみなされます。",
+    "login_button": "ログイン",
+    "login_help": "パスワードをお忘れですか？",
+    "login_mail": "メールアドレス",
+    "login_password": "パスワード",
+    "login_error": "電子メールまたはパスワードが間違っている",
   },
   "uzb": {
     "xabarlar": "Xabarlar",
@@ -37,7 +44,14 @@ export default {
     "facebook_sahifasi": "Facebook sahifasi",
     "instagram_sahifasi": "Instagram sahifasi",
     "telegram_sahifasi": "Telegram sahifasi",
-    "twitter_sahifasi": "Twitter(X) sahifasi"
+    "twitter_sahifasi": "Twitter(X) sahifasi",
+    "login": "Kirish",
+    "login_text": "Ushbu dasturga kirish orqali siz bizning shart va siyosatimizga rozilik bildirasiz",
+    "login_button": "Kirish",
+    "login_help": "Parolni unutdingizmi?",
+    "login_mail": "E-pochta manzili",
+    "login_password": "Parol",
+    "login_error": "E-pochta yoki parol noto'g'ri kiritilgan",
   },
   "eng": {
     "xabarlar": "Messages",
@@ -57,6 +71,13 @@ export default {
     "facebook_sahifasi": "Facebook page",
     "instagram_sahifasi": "Instagram page",
     "telegram_sahifasi": "Telegram channel",
-    "twitter_sahifasi": "Twitter(X) page"
+    "twitter_sahifasi": "Twitter(X) page",
+    "login": "Login",
+    "login_text": "By using our application you agree to our terms and policies",
+    "login_button": "Login",
+    "login_help": "Forgot password?",
+    "login_mail": "Email Address",
+    "login_password": "Password",
+    "login_error": "email or password is incorrect",
   }
 }

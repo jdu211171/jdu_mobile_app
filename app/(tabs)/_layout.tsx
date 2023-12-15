@@ -7,32 +7,15 @@ import {useSession} from "../../contexts/ctx";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {useLanguageContext} from "../../contexts/LanguageContext";
 
-/*
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
-*/
-/*
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof Ionicons>['name'];
-  color: string;
-  focused: boolean;
-}) {
-  return props.focused ?
-    <View style={{ height: 34, width: 34, backgroundColor: '#ffffff', borderRadius: 34 }}><Ionicons size={28} style={{ marginBottom: -3 }} {...props} /></View>
-    : <Ionicons size={28} style={{ marginBottom: -3 }} {...props} />;
-}
-*/
 export default function TabLayout() {
+  const sessionContext = useSession();
   const {translations} = useLanguageContext();
   const colorScheme = useColorScheme();
-  const sessionContext = useSession();
+
   if (sessionContext?.isLoading) {
-      return <Text>Loading...</Text>;
+    return <Text style={{ flex: 1, justifyContent: 'center', alignContent: 'center'}}>Loading...</Text>;
   }
+
   if (!sessionContext?.session) {
       return <Redirect href="/sign-in" />;
   }

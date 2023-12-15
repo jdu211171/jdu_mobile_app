@@ -3,12 +3,10 @@ import {useMessageContext} from "../contexts/MessageContext";
 import React, {useEffect, useState} from "react";
 import Message from "./Message";
 import MessageObject, {MessageObjectParams} from "./MessageObject";
-import {usePathname} from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import {StatusBar} from "expo-status-bar";
+import {useSession} from "../contexts/ctx";
 
 export default function RenderMessages() {
-
   const {
     allMessages,
     savedMessages,
@@ -17,18 +15,19 @@ export default function RenderMessages() {
     fetchFromAPI,
     saveToAsyncStorage,
     createMessageObjectCollection,
-    loadFromAsyncStorage
+    loadFromAsyncStorage,
   } = useMessageContext();
 
   const [refreshing, setRefreshing] = useState(false);
   const [messagesData, setMessagesData] = useState<MessageObject[]>([]);
-  const pathname = usePathname();
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true);
-    fetchFromAPI("https://wfjz3m1ilh.execute-api.eu-north-1.amazonaws.com/default/api/messages")
-      .then((r) => {
+    fetchFromAPI("https://ktd5kacfz5.execute-api.ap-northeast-1.amazonaws.com/default/api/message/", 'GET', null)
+      .then((r: any) => {
         allMessages.messages = [];
-        allMessages.addMessages(createMessageObjectCollection(r.data));
+        allMessages.addMessages(createMessageObjectCollection(r.data.messages));
+        setMessagesData(allMessages.messages);
         saveToAsyncStorage("all_messages", allMessages.messages);
       })
       .catch((error) => {
@@ -50,15 +49,11 @@ export default function RenderMessages() {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    if (pathname === '/') setMessagesData(allMessages.messages);
-    saveToAsyncStorage("all_messages", allMessages.messages);
-  }, [pathname]);
-
-
+  const session = useSession();
   // AsyncStorage.removeItem("all_messages");
   // AsyncStorage.removeItem("saved_messages");
+  // console.log(messagesData);
+  // console.log(session?.session);
 
   return (
     <ScrollView
@@ -78,8 +73,6 @@ export default function RenderMessages() {
     >
       {
         messagesData
-          .slice()
-          .reverse()
           .map((messageObject) => {
             return (
               <Message
@@ -88,10 +81,10 @@ export default function RenderMessages() {
                 messageIconColor="#0386D0"
                 messageTitle={messageObject.title}
                 messageText={messageObject.description}
-                date={messageObject.updatedDate}
+                date={messageObject.sent_at}
                 messageObject={messageObject}
                 readStatus={messageObject.isRead}
-                toBookmarks={savedMessages}
+                savedMessages={savedMessages}
                 setSavedStatus={setSavedStatus}
                 removeSavedStatus={removeSavedStatus}
                 saveToAsyncStorage={saveToAsyncStorage}

@@ -78,10 +78,10 @@ export function SessionProvider(props: React.PropsWithChildren) {
         saveToAsyncStorage,
         loadFromAsyncStorage,
         signOut: () => {
-          logout('https://ktd5kacfz5.execute-api.ap-northeast-1.amazonaws.com/default/api/auth/signOut', session)
-            .then(() => setSession(null))
-            .catch(e => console.error(e));
-          // setSession(null);
+          // logout('https://ktd5kacfz5.execute-api.ap-northeast-1.amazonaws.com/default/api/auth/signOut', session)
+          //   .then(() => setSession(null))
+          //   .catch(e => console.error(e));
+          setSession(null);
         },
       }}>
       {props.children}

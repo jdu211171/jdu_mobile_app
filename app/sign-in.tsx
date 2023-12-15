@@ -51,7 +51,7 @@ export default function SignIn() {
   return (
     <View style={styles.container}>
       <View style={styles.center}>
-        <Image source={require('../assets/images/jdu_logo.png')} style={styles.logo}/>
+        <Image source={require('../assets/images/splash.png')} style={styles.logo}/>
       </View>
       <Text style={styles.title}>{translations.login}</Text>
       <Text style={styles.subtitle}>{translations.login_text}</Text>
@@ -103,8 +103,8 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   logo: {
-    width: 180,
-    height: 180,
+    width: 200,
+    height: 200,
   },
   title: {
     fontSize: 30,

@@ -4,7 +4,6 @@ import React, {useEffect, useState} from "react";
 import Message from "./Message";
 import MessageObject, {MessageObjectParams} from "./MessageObject";
 import {StatusBar} from "expo-status-bar";
-import {useSession} from "../contexts/ctx";
 
 export default function RenderMessages() {
   const {
@@ -49,7 +48,7 @@ export default function RenderMessages() {
       }
     })();
   }, []);
-  const session = useSession();
+  // const session = useSession();
   // AsyncStorage.removeItem("all_messages");
   // AsyncStorage.removeItem("saved_messages");
   // console.log(messagesData);
@@ -84,10 +83,6 @@ export default function RenderMessages() {
                 date={messageObject.sent_at}
                 messageObject={messageObject}
                 readStatus={messageObject.isRead}
-                savedMessages={savedMessages}
-                setSavedStatus={setSavedStatus}
-                removeSavedStatus={removeSavedStatus}
-                saveToAsyncStorage={saveToAsyncStorage}
               />
             );
           })

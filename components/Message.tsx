@@ -5,6 +5,7 @@ import MessageObject from "./MessageObject";
 import ModalView from "./ModalView";
 import MessageObjectCollection from "./MessageObjectCollection";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {useMessageContext} from "../contexts/MessageContext";
 
 interface MessageProps {
   messageIconName: string;
@@ -14,10 +15,6 @@ interface MessageProps {
   date: string;
   messageObject: MessageObject;
   readStatus: boolean;
-  savedMessages: number[];
-  setSavedStatus: (id: number) => void;
-  removeSavedStatus: (id: number) => void;
-  saveToAsyncStorage: (key: string, data: any) => Promise<void>;
 }
 
 const Message: React.FC<MessageProps> = ({
@@ -28,11 +25,8 @@ const Message: React.FC<MessageProps> = ({
                                            date,
                                            messageObject,
                                            readStatus,
-                                           savedMessages,
-                                           setSavedStatus,
-                                           removeSavedStatus,
-                                           saveToAsyncStorage
                                          }) => {
+  const {setSavedStatus, removeSavedStatus, allMessages, savedMessages} = useMessageContext();
   const [bookmarkState, setBookmarkState] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [read, setRead] = useState(readStatus);

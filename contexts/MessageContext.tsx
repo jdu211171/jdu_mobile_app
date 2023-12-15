@@ -71,6 +71,11 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({childr
 
   const loadFromAsyncStorage = async (key: string) => AsyncStorage.getItem(key);
 
+  const saveToAsyncStorage = async (key: string, data: any): Promise<void> =>
+  {
+    await AsyncStorage.setItem(key, JSON.stringify(data))
+  };
+
   const sortUnreadMessages = (messages: MessageObjectCollection) => {
     messages.messages.sort((a, b) => {
       // Convert the boolean values to numbers (false becomes 0, true becomes 1)
@@ -80,15 +85,6 @@ export const MessageProvider: React.FC<{ children: React.ReactNode }> = ({childr
       // Compare the numeric values
       return bValue - aValue;
     });
-  }
-
-  async function saveToAsyncStorage<T>(key: string, data: T): Promise<void> {
-    try {
-      const jsonData = JSON.stringify(data);
-      await AsyncStorage.setItem(key, jsonData);
-    } catch (error) {
-      console.error('Error saving data to AsyncStorage:', error);
-    }
   }
 
   const fetchFromAPI = async (url: string, method: string, body: Record<string, any> | null = null) => {

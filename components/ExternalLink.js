@@ -1,25 +1,23 @@
-import { Link } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
-import React from "react";
-import { Platform } from "react-native";
-
-export function ExternalLink({ href, ...otherProps }) {
-    return (
-        <Link
-            {...otherProps}
-            hrefAttrs={{
-                // On web, launch the link in a new tab.
-                target: '_blank',
-            }}
-            href={href}
-            onPress={(e) => {
-                if (Platform.OS !== 'web') {
-                    // Prevent the default behavior of linking to the default browser on native.
-                    e.preventDefault();
-                    // Open the link in an in-app browser.
-                    WebBrowser.openBrowserAsync(href);
-                }
-            }}
-        />
-    );
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ExternalLink = void 0;
+var expo_router_1 = require("expo-router");
+var WebBrowser = require("expo-web-browser");
+var react_1 = require("react");
+var react_native_1 = require("react-native");
+function ExternalLink(props) {
+    return (<expo_router_1.Link hrefAttrs={{
+            // On web, launch the link in a new tab.
+            target: '_blank',
+        }} {...props} 
+    // @ts-expect-error: External URLs are not typed.
+    href={props.href} onPress={function (e) {
+            if (react_native_1.Platform.OS !== 'web') {
+                // Prevent the default behavior of linking to the default browser on native.
+                e.preventDefault();
+                // Open the link in an in-app browser.
+                WebBrowser.openBrowserAsync(props.href);
+            }
+        }}/>);
 }
+exports.ExternalLink = ExternalLink;
